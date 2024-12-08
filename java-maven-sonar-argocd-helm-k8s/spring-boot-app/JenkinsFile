@@ -8,6 +8,10 @@ pipeline {
   environment {
     SONARQUBE_URL = 'http://10.224.143.136:9000'  // SonarQube container URL (assuming SonarQube is running on the same Docker network)
     SONARQUBE_TOKEN = credentials('sonarqube')  // Store token securely in Jenkins credentials
+    GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
+    GIT_USER_NAME = "artibhoir369"
+    DOCKER_IMAGE = "artibhoir369/ultimate-cicd:${BUILD_NUMBER}"
+    REGISTRY_CREDENTIALS = credentials('docker-cred')
   }
   stages {
     stage('Checkout') {
@@ -32,10 +36,6 @@ pipeline {
       }
     }
     stage('Build and Push Docker Image') {
-      environment {
-        DOCKER_IMAGE = "artibhoir369/ultimate-cicd:${BUILD_NUMBER}"
-        REGISTRY_CREDENTIALS = credentials('docker-cred')
-      }
       steps {
         script {
           sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
@@ -47,25 +47,37 @@ pipeline {
       }
     }
     stage('Update Deployment File') {
-        environment {
-            GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
-            GIT_USER_NAME = "artibhoir369"
+      steps {
+        withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+          script {
+            // Configure Git and push changes
+            sh '''
+              echo "Configuring Git"
+              git config --global --add safe.directory /var/jenkins_home/workspace  # Mark as a safe directory
+              git config --global user.email "arti.xyz@gmail.com"
+              git config user.name "Arti Bhoir"
+              
+              echo "Updating deployment file"
+              cp java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml.template java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+              sed -i 's/replaceImageTag/'"$BUILD_NUMBER"'/g' java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+              
+              echo "Adding and committing changes"
+              git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+              git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+              
+              echo "Pushing changes to Git"
+              git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+            '''
+          }
         }
-        steps {
-            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config --global --add safe.directory /var/jenkins_home/workspace/new  # Mark as a safe directory
-                    git config --global user.email "arti.xyz@gmail.com"
-                    git config user.name "Arti Bhoir"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                    cp java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml.template java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    sed -i 's/replaceImageTag/'"$BUILD_NUMBER"'/g' java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
-        }
+      }
+    }
+  }
+  post {
+    always {
+      // Clean up any temporary files or resources after the build, if needed
+      echo 'Cleaning up workspace...'
+      cleanWs()
     }
   }
 }
