@@ -6,7 +6,7 @@ pipeline {
     }
   }
   environment {
-    SONARQUBE_URL = 'http://sonarqube:9000'  // SonarQube container URL (assuming SonarQube is running on the same Docker network)
+    SONARQUBE_URL = 'http://10.224.143.136:9000'  // SonarQube container URL (assuming SonarQube is running on the same Docker network)
     SONARQUBE_TOKEN = credentials('sonarqube')  // Store token securely in Jenkins credentials
   }
   stages {
