@@ -71,6 +71,12 @@ pipeline {
             git checkout main
             git pull origin main --no-rebase
 
+            # Add target/ to .gitignore (if not already added)
+            echo 'java-maven-sonar-argocd-helm-k8s/spring-boot-app/target/' >> .gitignore
+            git add .gitignore
+            git commit -m "Update .gitignore to exclude target directory"
+            git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+
             # Replace the placeholder with the current build number
             BUILD_NUMBER=${BUILD_NUMBER}
             sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
