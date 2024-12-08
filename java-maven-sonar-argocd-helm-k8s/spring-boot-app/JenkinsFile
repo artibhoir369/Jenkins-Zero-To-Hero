@@ -68,7 +68,6 @@ pipeline {
                     echo 'java-maven-sonar-argocd-helm-k8s/spring-boot-app/target/' >> .gitignore
                     git add .gitignore
                     git commit -m "Update .gitignore to exclude target directory"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
 
                     BUILD_NUMBER=${BUILD_NUMBER}
                     sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
