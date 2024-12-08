@@ -57,11 +57,6 @@ pipeline {
                     git config --global --add safe.directory /var/jenkins_home/workspace/new  # Mark as a safe directory
                     git config --global user.email "arti.xyz@gmail.com"
                     git config user.name "Arti Bhoir"
-
-                    # Checkout main branch and pull latest changes
-                    #git checkout main
-                    #git pull origin main --no-rebase
-
                     BUILD_NUMBER=${BUILD_NUMBER}
                     cp java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml.template java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
                     sed -i 's/replaceImageTag/'"$BUILD_NUMBER"'/g' java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
