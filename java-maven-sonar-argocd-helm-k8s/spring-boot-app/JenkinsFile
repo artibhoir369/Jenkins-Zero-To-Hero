@@ -55,7 +55,7 @@ pipeline {
           sh '''
             pwd
             ls -la
-            git rev-parse --show-toplevel
+            git config --global --add safe.directory /var/jenkins_home/workspace/CI
             git config user.email "arti.xyz@gmail.com"
             git config user.name "Arti Bhoir"
             BUILD_NUMBER=${BUILD_NUMBER}
