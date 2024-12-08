@@ -56,10 +56,9 @@ pipeline {
                 sh '''
                     pwd
                     ls -la
-                    cd /var/jenkins_home/workspace/CI
+                    git config --global --add safe.directory /var/jenkins_home/workspace/CI  # Mark as a safe directory
                     git config --global user.email "arti.xyz@gmail.com"
                     git config user.name "Arti Bhoir"
-                    git config --global --add safe.directory /var/jenkins_home/workspace/CI  # Mark as a safe directory
 
                     # Checkout main branch and pull latest changes
                     git checkout main
