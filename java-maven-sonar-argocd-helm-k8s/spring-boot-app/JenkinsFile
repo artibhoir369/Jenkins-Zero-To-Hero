@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'maven:3.8-openjdk-17-slim'  // Custom Maven Docker image with Java 17 and SonarQube Scanner
+      image 'artibhoir369/maven-docker-agent:v1'  // Custom Maven Docker image with Java 17 and SonarQube Scanner
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket for Docker commands
     }
   }
