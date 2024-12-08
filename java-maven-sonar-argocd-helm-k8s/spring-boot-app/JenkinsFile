@@ -53,7 +53,7 @@ pipeline {
             // Configure Git and push changes
             sh '''
               echo "Configuring Git"
-              git config --global --add safe.directory /var/jenkins_home/workspace  # Mark as a safe directory
+              git config --global --add safe.directory /var/jenkins_home/workspace/new  # Mark as a safe directory
               git config --global user.email "arti.xyz@gmail.com"
               git config user.name "Arti Bhoir"
               
