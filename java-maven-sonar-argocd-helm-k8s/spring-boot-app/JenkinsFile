@@ -13,7 +13,8 @@ pipeline {
     stage('Checkout') {
       steps {
         sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
+        // Uncomment if needed
+        // git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
       }
     }
     stage('Build and Test') {
@@ -40,7 +41,7 @@ pipeline {
           sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
           def dockerImage = docker.image("${DOCKER_IMAGE}")
           docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
-              dockerImage.push()
+            dockerImage.push()
           }
         }
       }
@@ -53,12 +54,32 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
           sh '''
-            git config user.email "arti.xyz@gmail.com"
-            git config user.name "Arti Bhoir"
+            # Ensure we're in the correct directory
+            echo "Current working directory:"
+            pwd
+            ls -la
+
+            # Navigate to the repository's directory (in case we're not already there)
+            cd /var/jenkins_home/workspace/CI
+
+            # Configure git user (in case not already set)
+            git config --global user.email "arti.xyz@gmail.com"
+            git config --global user.name "Arti Bhoir"
+            git config --global --add safe.directory /var/jenkins_home/workspace/CI  # Mark as a safe directory
+
+            # Checkout main branch and pull latest changes
+            git checkout main
+            git pull origin main --no-rebase
+
+            # Replace the placeholder with the current build number
             BUILD_NUMBER=${BUILD_NUMBER}
             sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+
+            # Add and commit the change
             git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
             git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+
+            # Push changes to GitHub repository
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
           '''
         }
