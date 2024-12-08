@@ -12,8 +12,8 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
+        //sh 'echo passed'
+        git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
       }
     }
     stage('Build and Test') {
@@ -63,6 +63,7 @@ pipeline {
             git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
             git commit -m "Update deployment image to version ${BUILD_NUMBER}"
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+            rm -rf /var/jenkins_home/workspace/CI/.git
           '''
         }
       }
