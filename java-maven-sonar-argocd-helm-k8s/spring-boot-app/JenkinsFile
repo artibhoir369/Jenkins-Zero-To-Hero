@@ -12,8 +12,8 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        //sh 'echo passed'
-        git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
+        sh 'echo passed'
+        //git branch: 'main', url: 'https://github.com/artibhoir369/Jenkins-Zero-To-Hero.git'
       }
     }
     stage('Build and Test') {
@@ -53,6 +53,7 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
           sh '''
+            cd $WORKSPACE/java-maven-sonar-argocd-helm-k8s/spring-boot-app
             git config user.email "arti.xyz@gmail.com"
             git config user.name "Arti Bhoir"
             BUILD_NUMBER=${BUILD_NUMBER}
