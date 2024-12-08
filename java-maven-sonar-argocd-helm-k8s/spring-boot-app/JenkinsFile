@@ -56,6 +56,7 @@ pipeline {
             pwd
             ls -la
             git config --global --add safe.directory /var/jenkins_home/workspace/CI
+            git checkout main
             git config user.email "arti.xyz@gmail.com"
             git config user.name "Arti Bhoir"
             BUILD_NUMBER=${BUILD_NUMBER}
@@ -63,7 +64,6 @@ pipeline {
             git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
             git commit -m "Update deployment image to version ${BUILD_NUMBER}"
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-            rm -rf /var/jenkins_home/workspace/CI/.git
           '''
         }
       }
